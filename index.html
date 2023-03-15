@@ -6,17 +6,17 @@
     <title>mỹ pong ver1.4</title>
     <meta name="description" content="キーボードの左右で移動してブロックを崩します。">
     <meta charset="utf-8">
-    <meta property="og:url" content="https://paxcreation.com/abe/pong/pong.html" />
+    <meta property="og:url" content="/pong.html" />
     <meta property="og:type" content="product" />
     <meta property="og:title" content="my pong" />
     <meta property="og:description" content="キーボードの左右で移動してブロックを崩します。" />
     <meta property="og:site_name" content="my pong" />
-    <meta property="og:image" content="https://paxcreation.com/abe/pong/ogp.jpg" />
+    <meta property="og:image" content="/ogp.jpg" />
     <meta name="robots" content="noindex,nofollow">
     <style>
         body {
             background-color: #333;
-            background-image: url("https://paxcreation.com/abe/pong/bg2.jpg");
+            background-image: url("/bg2.jpg");
             background-size: cover;
             font-family: 'Henny Penny', cursive;
             letter-spacing: 0.6em;
@@ -36,7 +36,7 @@
         }
 
         canvas {
-            background-image: url("https://paxcreation.com/abe/pong/bg.jpg");
+            background-image: url("/bg.jpg");
             background-size: cover;
             border: 1px solid #ccc;
             margin: auto;
@@ -135,7 +135,7 @@
     <div id="logo"><img src="logo.png"></div>
     <p id="score" class="score_num">SCORE: 000</p>
     <canvas id="canvas" width="920" height="660"></canvas>
-    <p id="lives_num"><img id="lives_icon" src="https://paxcreation.com/abe/pong/6bfafe38d9a67b82.png"> :<span
+    <p id="lives_num"><img id="lives_icon" src="/6bfafe38d9a67b82.png"> :<span
             id="lives"></span></p>
     <div id="controllers" class="target-element">
         <button id="left">◀︎</button>
@@ -169,7 +169,7 @@
         const livesSpan = document.getElementById("lives");
 
         let ballImg = new Image();
-        ballImg.src = "https://paxcreation.com/abe/pong/6bfafe38d9a67b82.png";
+        ballImg.src = "/ball.png";
 
 
         // ブロックの設定
@@ -306,7 +306,7 @@
                                 document.location.reload();
                             }
                             let audio = new Audio();
-                            audio.src = "https://paxcreation.com/abe/pong/shot.wav";
+                            audio.src = "/shot.wav";
                             audio.play();
                         }
                     }
@@ -337,7 +337,7 @@
 
         window.onload = function () {
             let audio = new Audio();
-            audio.src = "https://paxcreation.com/abe/pong/viet.mp3";
+            audio.src = "/viet.mp3";
             audio.volume = 0.5;
             audio.play();
         }
