@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>mỹ pong ver1.3</title>
+    <style>
+        body {
+            background-color: #333;
+            background-image: url("https://paxcreation.com/abe/bg2.jpg");
+            background-size: cover;
+            font-family: 'Henny Penny', cursive;
+            letter-spacing: 0.6em;
+        }
+
+        canvas {
+            background-image: url("https://paxcreation.com/abe/bg.jpg");
+            background-size: cover;
+            border: 1px solid #ccc;
+            margin: auto;
+            display: block;
+        }
+
+        #controllers {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #controllers button {
+            font-size: 30px;
+            padding: 40px;
+            width: 42%;
+            border: none;
+            border-radius: 5px;
+            background-color: #7b68ee;
+            color: white;
+            margin: 0 20px;
+        }
+
+        #controllers button:hover {
+            background-color: #6a5acd;
+            cursor: pointer;
+        }
+
+        /* sp用のCSSを記述 */
+        @media only screen and (min-width: 768px) {
+            #lives_num {
+                color: #fff;
+                font-size: 60px;
+                text-align: center;
+            }
+
+            #lives_icon {
+                padding-top: 12px;
+                height: 50px;
+            }
+
+            .score_num {
+                color: #fff;
+                font-size: 60px;
+                text-align: center;
+            }
+        }
+
+        /* PC用のCSSを記述 */
+        @media only screen and (min-width: 1024px) {
+            #lives_num {
+                color: #fff;
+                font-size: 20px;
+                text-align: center;
+            }
+
+            #lives_icon {
+                padding-top: 12px;
+                height: 34px;
+            }
+
+            .score_num {
+                color: #fff;
+                font-size: 26px;
+                text-align: center;
+            }
+        }
+
+        /* 769px以上の場合 */
+        @media screen and (min-width: 769px) {
+            .target-element {
+                display: block;
+            }
+        }
+
+        @media screen and (min-width: 1024px) {
+            .target-element {
+                display: none;
+            }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Henny+Penny&display=swap" rel="stylesheet">
+</head>
+
+<audio id="bounce" src="https://paxcreation.com/abe/shot.wav"></audio>
+<audio id="bgm" src="https://paxcreation.com/abe/viet.mp3"></audio>
+
+<body>
+    <p id="score" class="score_num">SCORE: 000</p>
+    <canvas id="canvas" width="900" height="640"></canvas>
+    <p id="lives_num"><img id="lives_icon" src="https://paxcreation.com/abe/6bfafe38d9a67b82.png"> :<span
+            id="lives"></span></p>
+    <div id="controllers" class="target-element">
+        <button id="left">◀︎</button>
+        <button id="right">▶︎</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const ballRadius = 18;
+        let x = canvas.width / 2;
+        let y = canvas.height - 20;
+        let angle = Math.floor(Math.random() * 360) + 360;
+        let radians = angle * Math.PI / 180;
+        let speed = Math.floor(Math.random() * 4) + 4;
+        let dx = Math.cos(radians) * speed;
+        let dy = Math.sin(radians) * speed;
+        const paddleHeight = 16;
+        const paddleWidth = 130;
+        let paddleX = (canvas.width - paddleWidth) / 2;
+        let rightPressed = false;
+        let leftPressed = false;
+        let score = 0;
+        const scoreDisplay = document.getElementById("score");
+        let lives = 3;
+        const livesSpan = document.getElementById("lives");
+
+        let ballImg = new Image();
+        ballImg.src = "https://paxcreation.com/abe/6bfafe38d9a67b82.png";
+
+
+        // ブロックの設定
+        const brickRowCount = 5;
+        const brickColumnCount = 10;
+        const brickWidth = 80;
+        const brickHeight = 20;
+        const brickPadding = 6;
+        const brickOffsetTop = 30;
+        const brickOffsetLeft = (canvas.width - (brickWidth + brickPadding) * brickColumnCount) / 2;
+        let bricks = [];
+
+        for (let c = 0; c < brickColumnCount; c++) {
+            bricks[c] = [];
+            for (let r = 0; r < brickRowCount; r++) {
+                bricks[c][r] = { x: 0, y: 0, status: 1 };
+            }
+        }
+
+        function drawBricks() {
+            for (let c = 0; c < brickColumnCount; c++) {
+                for (let r = 0; r < brickRowCount; r++) {
+                    if (bricks[c][r].status == 1) {
+                        let brickX = (c * (brickWidth + brickPadding)) + brickOffsetLeft;
+                        let brickY = (r * (brickHeight + brickPadding)) + brickOffsetTop;
+                        bricks[c][r].x = brickX;
+                        bricks[c][r].y = brickY;
+                        ctx.beginPath();
+                        ctx.rect(brickX, brickY, brickWidth, brickHeight);
+                        ctx.fillStyle = "#fff";
+                        ctx.fill();
+                        ctx.closePath();
+                    }
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBall();
+            drawPaddle();
+            drawBricks();
+            collisionDetection();
+            livesSpan.textContent = lives;
+
+            if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+                dx = -dx;
+                score += 10; // 壁に当たったときのスコア
+                scoreDisplay.textContent = "Score: " + score;
+            }
+
+            if (y + dy < ballRadius) {
+                dy = -dy;
+                score += 10; // 壁に当たったときのスコア
+                scoreDisplay.textContent = "Score: " + score;
+            } else if (y + dy > canvas.height - ballRadius - paddleHeight) {
+                if (x > paddleX && x < paddleX + paddleWidth) {
+                    let collidePoint = x - (paddleX + paddleWidth / 2);
+                    collidePoint = collidePoint / (paddleWidth / 2);
+                    angle = collidePoint * Math.PI / 3;
+                    dx = speed * Math.sin(angle);
+                    dy = -speed * Math.cos(angle);
+                } else {
+                    lives--;
+                    if (!lives) {
+                        alert("ヒルゴハン...");
+                        document.location.reload();
+                    } else {
+                        x = canvas.width / 2;
+                        y = canvas.height - 20;
+                        dx = 3;
+                        dy = -3;
+                        paddleX = (canvas.width - paddleWidth) / 2;
+                    }
+                }
+            }
+
+
+            if (rightPressed && paddleX < canvas.width - paddleWidth) {
+                paddleX += 7;
+            } else if (leftPressed && paddleX > 0) {
+                paddleX -= 7;
+            }
+
+        }
+
+        function keyDownHandler(e) {
+            if (e.key == "Right" || e.key == "ArrowRight") {
+                rightPressed = true;
+            } else if (e.key == "Left" || e.key == "ArrowLeft") {
+                leftPressed = true;
+            }
+        }
+
+        function keyUpHandler(e) {
+            if (e.key == "Right" || e.key == "ArrowRight") {
+                rightPressed = false;
+            } else if (e.key == "Left" || e.key == "ArrowLeft") {
+                leftPressed = false;
+            }
+        }
+
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
+
+        function drawBall() {
+            ctx.beginPath();
+            ctx.drawImage(ballImg, x - ballRadius, y - ballRadius, ballRadius * 2, ballRadius * 2);
+            ctx.closePath();
+            x += dx;
+            y += dy;
+        }
+
+        function drawPaddle() {
+            ctx.beginPath();
+            ctx.rect(paddleX, canvas.height - paddleHeight - 24, paddleWidth, paddleHeight);
+            ctx.fillStyle = "#fff";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function collisionDetection() {
+            for (let c = 0; c < brickColumnCount; c++) {
+                for (let r = 0; r < brickRowCount; r++) {
+                    let b = bricks[c][r];
+                    if (b.status == 1) {
+                        if (x + ballRadius > b.x && x - ballRadius < b.x + brickWidth && y + ballRadius > b.y && y - ballRadius < b.y + brickHeight) {
+                            dy = -dy;
+                            b.status = 0;
+                            score += 100; // ブロックを壊したときのスコア
+                            scoreDisplay.textContent = "Score: " + score;
+                            if (score == brickRowCount * brickColumnCount) {
+                                alert("ヒルゴハン！");
+                                document.location.reload();
+                            }
+                            let audio = new Audio();
+                            audio.src = "https://paxcreation.com/abe/shot.wav";
+                            audio.play();
+                        }
+                    }
+                }
+            }
+        }
+
+        setInterval(draw, 10);
+
+        const leftButton = document.getElementById("left");
+        const rightButton = document.getElementById("right");
+
+        leftButton.addEventListener("touchstart", () => {
+            leftPressed = true;
+        });
+
+        leftButton.addEventListener("touchend", () => {
+            leftPressed = false;
+        });
+
+        rightButton.addEventListener("touchstart", () => {
+            rightPressed = true;
+        });
+
+        rightButton.addEventListener("touchend", () => {
+            rightPressed = false;
+        });
+
+        window.onload = function () {
+            let audio = new Audio();
+            audio.src = "https://paxcreation.com/abe/viet.mp3";
+            audio.volume = 0.5;
+            audio.play();
+        }
+
+    </script>
+</body>
+
+</html>
