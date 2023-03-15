@@ -11,7 +11,7 @@
     <meta property="og:title" content="my pong" />
     <meta property="og:description" content="キーボードの左右で移動してブロックを崩します。" />
     <meta property="og:site_name" content="my pong" />
-    <meta property="og:image" content="https://paxcreation.com/abe/pong/ogp.png" />
+    <meta property="og:image" content="https://paxcreation.com/abe/pong/ogp.jpg" />
     <meta name="robots" content="noindex,nofollow">
     <style>
         body {
@@ -21,12 +21,18 @@
             font-family: 'Henny Penny', cursive;
             letter-spacing: 0.6em;
 
-            -webkit-touch-callout: none; /* iOS Safari */
-            -webkit-user-select: none; /* Safari */
-            -khtml-user-select: none; /* Konqueror HTML */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+            -webkit-touch-callout: none;
+            /* iOS Safari */
+            -webkit-user-select: none;
+            /* Safari */
+            -khtml-user-select: none;
+            /* Konqueror HTML */
+            -moz-user-select: none;
+            /* Firefox */
+            -ms-user-select: none;
+            /* Internet Explorer/Edge */
+            user-select: none;
+            /* Non-prefixed version, currently supported by Chrome and Opera */
         }
 
         canvas {
@@ -59,8 +65,8 @@
         }
 
         .brick {
-    opacity: 0.5;
-}
+            opacity: 0.5;
+        }
 
         /* sp用のCSSを記述 */
         @media only screen and (min-width: 768px) {
@@ -114,6 +120,11 @@
                 display: none;
             }
         }
+
+        #logo {
+            text-align: center;
+            margin-bottom: -40px;
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -121,6 +132,7 @@
 </head>
 
 <body>
+    <div id="logo"><img src="logo.png"></div>
     <p id="score" class="score_num">SCORE: 000</p>
     <canvas id="canvas" width="920" height="660"></canvas>
     <p id="lives_num"><img id="lives_icon" src="https://paxcreation.com/abe/pong/6bfafe38d9a67b82.png"> :<span
